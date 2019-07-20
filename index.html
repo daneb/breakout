@@ -26,32 +26,46 @@
 
     function preload ()
     {
-        this.load.setBaseURL('http://labs.phaser.io');
-
-        this.load.image('sky', 'assets/skies/space3.png');
-        this.load.image('logo', 'assets/sprites/phaser3-logo.png');
-        this.load.image('red', 'assets/particles/red.png');
+        this.load.image('background', 'assets/background.png');
+        this.load.image('wall', 'assets/puzzlepack/png/element_green_square.png');
     }
 
     function create ()
     {
-        this.add.image(400, 300, 'sky');
+        const verticalWalls  = 12;
+        const verticalBlockSize = 42;
+        const leftVerticalWallX = 100;
+        const rightVerticalWallX = 700;
+        let leftVerticalWallHeight = 540;
+        let rightVerticalWallHeight = 540;
 
-        var particles = this.add.particles('red');
+        const horizontalWalls = 12;
+        const horizontalBlockSize = 30;
 
-        var emitter = particles.createEmitter({
-            speed: 100,
-            scale: { start: 1, end: 0 },
-            blendMode: 'ADD'
-        });
+        this.add.image(400, 300, 'background');
+        this.add.image(400, 300, 'wall');
 
-        var logo = this.physics.add.image(400, 100, 'logo');
+        platforms = this.physics.add.staticGroup();
 
-        logo.setVelocity(100, 200);
-        logo.setBounce(1, 1);
-        logo.setCollideWorldBounds(true);
+        for(let i = 1; i <= verticalWalls; i++) {
+            leftVerticalWallHeight = leftVerticalWallHeight - verticalBlockSize;
+            platforms.create(leftVerticalWallX, leftVerticalWallHeight, 'wall').setScale(1.5).refreshBody();
+        }
 
-        emitter.startFollow(logo);
+        for(let i = 1; i <= verticalWalls; i++) {
+            rightVerticalWallHeight = rightVerticalWallHeight - verticalBlockSize;
+            platforms.create(rightVerticalWallX, rightVerticalWallHeight, 'wall').setScale(1.5).refreshBody();
+        }
+
+        for(let i = 1; i <= verticalWalls; i++) {
+            rightVerticalWallHeight = rightVerticalWallHeight - verticalBlockSize;
+            platforms.create(rightVerticalWallX, rightVerticalWallHeight, 'wall').setScale(1.5).refreshBody();
+        }
+
+
+
+        
+
     }
     </script>
 
