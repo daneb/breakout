@@ -15,6 +15,8 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('yellow', 'puzzlepack/png/element_yellow_rectangle.png');
     this.load.image('grey', 'puzzlepack/png/element_grey_rectangle.png');
     this.load.image('ball', 'puzzlepack/png/ballBlue.png');
+    this.load.image('paddle', 'puzzlepack/png/paddleBlu.png')
+    this.load.atlas('assets', 'assets/games/breakout/breakout.png', 'assets/games/breakout/breakout.json');
   }
 
   create() {

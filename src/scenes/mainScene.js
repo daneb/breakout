@@ -1,22 +1,16 @@
 class MainScene extends Phaser.Scene {
+
+   ball = "";
+   player = "";
+   cursors = "";
+   blueBricks = "";
+   redBricks = "";
+
   constructor() {
     super({ key: 'MainScene' })
   }
 
   create() {
-
-    const verticalWalls  = 12;
-    const verticalBlockSize = 42;
-    const leftVerticalWallX = 100;
-    const rightVerticalWallX = 700;
-    let leftVerticalWallHeight = 540;
-    let rightVerticalWallHeight = 540;
-
-    // Horizontal
-    const horizontalWalls = 19;
-    const horizontalBlockSize = 30;
-    const horizontalHeight = 28;
-    let horizontalX = 100;
 
     // Brick Layer One
     const bricks = 8;
@@ -29,37 +23,96 @@ class MainScene extends Phaser.Scene {
 
     // Static World
     this.add.image(400, 300, 'background');
+    this.physics.world.setBoundsCollision(true, true, true, false);
 
     let platforms = this.physics.add.staticGroup();
 
-    for(let i = 1; i <= horizontalWalls; i++) {
-        horizontalX = horizontalX + horizontalBlockSize;
-        platforms.create(horizontalX, horizontalHeight, 'wall');
-    }
+    this.blueBricks = this.physics.add.group({
+      key: 'blue',
+      repeat: 9,
+      immovable: true,
+      setXY: {
+        x: 80,
+        y: 90,
+        stepX: 70
+      }
+    });
 
-    for(let i = 1; i <= verticalWalls; i++) {
-        leftVerticalWallHeight = leftVerticalWallHeight - verticalBlockSize;
-        platforms.create(leftVerticalWallX, leftVerticalWallHeight, 'wall').setScale(1.5).refreshBody();
-    }
+    // Add red bricks
+    this.redBricks = this.physics.add.group({
+      key: 'red',
+      repeat: 9,
+      immovable: true,
+      setXY: {
+        x: 80,
+        y: 40,
+        stepX: 70
+      }
+    });
 
-    for(let i = 1; i <= verticalWalls; i++) {
-        rightVerticalWallHeight = rightVerticalWallHeight - verticalBlockSize;
-        platforms.create(rightVerticalWallX, rightVerticalWallHeight, 'wall').setScale(1.5).refreshBody();
-    }
+    this.yellowBricks = this.physics.add.group({
+      key: 'yellow',
+      repeat: 9,
+      immovable: true,
+      setXY: {
+        x: 80,
+        y: 140,
+        stepX: 70
+      }
+    });
 
-    // Bricks
-    for(let i = 1; i <= bricks; i++) {
-        brickBlueX = brickBlueX + brickSize;
-        platforms.create(brickBlueX, brickBlueHeight, 'blue');
-    }
 
-    for(let i = 1; i <= bricks; i++) {
-        brickGreenX = brickGreenX + brickSize;
-        platforms.create(brickGreenX, brickGreenHeight, 'green');
-    }
+    this.ball = this.physics.add.sprite(this.game.config.width / 2, this.game.config.height - 100, 'ball');
+    this.ball.setCollideWorldBounds(true).setBounce(1);
+    this.ball.setSize(0.5);
 
-    let ball = this.add.sprite(this.game.config.width / 2, this.game.config.height - 100, 'ball');
-    ball.setSize(0.5);
+    this.player = this.physics.add.sprite(400, 600, 'paddle').setImmovable();
+    this.player.setCollideWorldBounds(true);
+    this.player.body.setVelocityX(0);
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+  this.ball.setBounce(1, 1);
+  this.physics.world.checkCollision.down = false;
+
+  this.physics.add.collider(this.ball, this.blueBricks, this.hitBrick, null, this);
+  this.physics.add.collider(this.ball, this.yellowBricks, this.hitBrick, null, this);
+  this.physics.add.collider(this.ball, this.redBricks, this.hitBrick, null, this);
+  
+  } 
+
+  isGameOver(world) {
+    return this.ball.body.y > world.bounds.height;
+  }
+
+  isWon() {
+    return true;
+  }
+
+  update() {
+    console.log("Hello");
+
+    if (this.cursors.left.isDown) {
+      this.player.body.setVelocityX(-350);
+    } else if (this.cursors.right.isDown) {
+      this.player.body.setVelocityX(350);
+      this.ball.setVelocityY(-200);
+    }
 
   }
+
+  hitBrick(ball, brick) {
+    brick.disableBody(true, true);
+  
+    if (ball.body.velocity.x === 0) {
+      randNum = Math.random();
+      if (randNum >= 0.5) {
+        ball.body.setVelocityX(150);
+      } else {
+        ball.body.setVelocityX(-150);
+      }
+    }
+  }
+
+
 }
