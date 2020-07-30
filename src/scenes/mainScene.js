@@ -6,6 +6,9 @@ class MainScene extends Phaser.Scene {
    blueBricks = "";
    redBricks = "";
    gameStarted = false;
+   score = 0;
+   scoreBuffer = 0;
+   scoreText = "";
 
 
   constructor() {
@@ -17,9 +20,77 @@ class MainScene extends Phaser.Scene {
     // Static World
     this.add.image(400, 300, 'background');
     this.physics.world.setBoundsCollision(true, true, true, false);
-
     let platforms = this.physics.add.staticGroup();
 
+    this.setupBricks();
+    this.setupBall();
+    this.setupPaddle();
+    this.setupUserInput();
+    this.setupCollissions();
+    this.scoreText = this.add.text(180, 0, 'Score: 0').setFont('32px Arial Black').setFill('#ffffff').setShadow(2, 2, "#333333", 2);
+  
+  } 
+
+  isGameOver(world) {
+    return this.ball.body.y > world.bounds.height;
+  }
+
+  isWon() {
+    return true;
+  }
+
+  update() {
+
+    // User Input
+    if (this.cursors.left.isDown) {
+      this.player.body.setVelocityX(-350);
+    } else if (this.cursors.right.isDown) {
+      this.player.body.setVelocityX(350);
+      
+      if (!this.gameStarted) {
+        this.gameStarted = true;
+        this.ball.setVelocityY(-200);
+      }  
+    }
+
+  }
+
+  setupUserInput()
+  {
+    this.cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  setupCollissions()
+  {
+    this.physics.world.checkCollision.down = false;
+
+    // Collission physics
+    this.physics.add.collider(this.player, this.ball,  this.hitPaddle, null, this);
+    this.physics.add.collider(this.ball, this.blueBricks, this.hitBrick, null, this);
+    this.physics.add.collider(this.ball, this.yellowBricks, this.hitBrick, null, this);
+    this.physics.add.collider(this.ball, this.redBricks, this.hitBrick, null, this);
+    this.physics.add.collider(this.ball, this.purpleBricks, this.hitBrick, null, this);
+  }
+
+  setupPaddle()
+  {
+      // Paddle physics
+      this.player = this.physics.add.sprite(400, 600, 'paddle').setImmovable(true);
+      this.player.setCollideWorldBounds(true);
+      this.player.body.setVelocityX(1);
+  }
+
+  setupBall()
+  {
+     // Ball physics
+     this.ball = this.physics.add.sprite(this.game.config.width / 2, this.game.config.height - 100, 'ball');
+     this.ball.setCollideWorldBounds(true).setBounce(1);
+     this.ball.setSize(0.5);
+     this.ball.setBounce(1, 1);
+  }
+
+  setupBricks()
+  {
     this.blueBricks = this.physics.add.group({
       key: 'blue',
       repeat: 9,
@@ -64,56 +135,8 @@ class MainScene extends Phaser.Scene {
         stepX: 70
       }
     });
-
-
-  // Ball physics
-  this.ball = this.physics.add.sprite(this.game.config.width / 2, this.game.config.height - 100, 'ball');
-  this.ball.setCollideWorldBounds(true).setBounce(1);
-  this.ball.setSize(0.5);
-
-  // Paddle physics
-  this.player = this.physics.add.sprite(400, 600, 'paddle').setImmovable(true);
-  this.player.setCollideWorldBounds(true);
-  this.player.body.setVelocityX(1);
-
-  // User input
-  this.cursors = this.input.keyboard.createCursorKeys();
-
-  this.ball.setBounce(1, 1);
-  this.physics.world.checkCollision.down = false;
-
-  // Collission physics
-  this.physics.add.collider(this.player, this.ball,  this.hitPaddle, null, this);
-  this.physics.add.collider(this.ball, this.blueBricks, this.hitBrick, null, this);
-  this.physics.add.collider(this.ball, this.yellowBricks, this.hitBrick, null, this);
-  this.physics.add.collider(this.ball, this.redBricks, this.hitBrick, null, this);
-  this.physics.add.collider(this.ball, this.purpleBricks, this.hitBrick, null, this);
-  
-  } 
-
-  isGameOver(world) {
-    return this.ball.body.y > world.bounds.height;
   }
 
-  isWon() {
-    return true;
-  }
-
-  update() {
-
-    if (this.cursors.left.isDown) {
-      this.player.body.setVelocityX(-350);
-    } else if (this.cursors.right.isDown) {
-      this.player.body.setVelocityX(350);
-      
-      if (!this.gameStarted) {
-        this.gameStarted = true;
-        this.ball.setVelocityY(-200);
-      }
-      
-    }
-
-  }
 
   hitPaddle(ball, paddle)
   {
@@ -129,8 +152,14 @@ class MainScene extends Phaser.Scene {
   }
 
   hitBrick(ball, brick) {
+
+    // TODO: what happens when all bricks are finished?
+
     brick.disableBody(true, true);
-  
+
+    this.score += 1;
+    this.scoreText.setText('Score:' + this.score);
+
     if (ball.body.velocity.x === 0) {
       let randNum = Math.random();
       if (randNum >= 0.5) {
