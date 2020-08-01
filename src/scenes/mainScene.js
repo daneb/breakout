@@ -9,6 +9,7 @@ class MainScene extends Phaser.Scene {
    score = 0;
    scoreBuffer = 0;
    scoreText = "";
+   brickCount = 40;
 
 
   constructor() {
@@ -27,12 +28,12 @@ class MainScene extends Phaser.Scene {
     this.setupPaddle();
     this.setupUserInput();
     this.setupCollissions();
-    this.scoreText = this.add.text(180, 0, 'Score: 0').setFont('32px Arial Black').setFill('#ffffff').setShadow(2, 2, "#333333", 2);
+    this.setupText();
   
   } 
 
-  isGameOver(world) {
-    return this.ball.body.y > world.bounds.height;
+  isGameOver() {
+    return this.ball.body.y > this.game.config.height;
   }
 
   isWon() {
@@ -40,6 +41,14 @@ class MainScene extends Phaser.Scene {
   }
 
   update() {
+
+    var ballBounds = this.ball.getBounds();
+    
+    // Game over
+    if(this.isGameOver())
+    {
+      this.gameOver();
+    }
 
     // User Input
     if (this.cursors.left.isDown) {
@@ -53,6 +62,14 @@ class MainScene extends Phaser.Scene {
       }  
     }
 
+  }
+
+
+  setupText()
+  {
+    this.scoreText = this.add.text(180, 0, 'Score: 0').setFont('32px Arial Black').setFill('#ffffff').setShadow(2, 2, "#333333", 2);
+    this.stateText = this.add.text(300, 300, 'Hello').setFont('32px Arial Black').setFill('#ff4d4d').setShadow(2, 2, "#333333", 2);
+    this.stateText.visible = false;
   }
 
   setupUserInput()
@@ -160,14 +177,34 @@ class MainScene extends Phaser.Scene {
     this.score += 1;
     this.scoreText.setText('Score:' + this.score);
 
-    if (ball.body.velocity.x === 0) {
-      let randNum = Math.random();
-      if (randNum >= 0.5) {
-        ball.body.setVelocityX(150);
-      } else {
-        ball.body.setVelocityX(-150);
+    if(this.score === this.brickCount)
+    {
+      this.stateText.text = "GAME OVER \n Click to restart";
+      this.stateText.visible = true;
+
+      // the click to restart handler
+      //this.input.onTap.add(restart, this);
+
+    } else {
+      if (ball.body.velocity.x === 0) {
+        let randNum = Math.random();
+        if (randNum >= 0.5) {
+          ball.body.setVelocityX(150);
+        } else {
+          ball.body.setVelocityX(-150);
+        }
       }
     }
+   
+  }
+
+  gameOver() {
+    this.stateText.text = "GAME OVER \nClick to restart";
+    this.stateText.visible = true;
+  }
+
+  restart() {
+      this.scene.restart();
   }
 
 
