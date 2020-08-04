@@ -23,7 +23,7 @@ class MainScene extends Phaser.Scene {
     this.physics.world.setBoundsCollision(true, true, true, false);
     let platforms = this.physics.add.staticGroup();
 
-    console.log("create called");
+    this.gameStarted = true;
 
     this.setupBricks();
     this.setupPaddle();
@@ -31,16 +31,10 @@ class MainScene extends Phaser.Scene {
     this.setupUserInput();
     this.setupCollissions();
     this.setupText();
+
+    this.gameStarted = false;
   
   } 
-
-  isGameOver() {
-    return this.ball.body.y > this.game.config.height;
-  }
-
-  isWon() {
-    return true;
-  }
 
   update() {
 
@@ -173,12 +167,10 @@ class MainScene extends Phaser.Scene {
 
   hitBrick(ball, brick) {
 
-    // TODO: what happens when all bricks are finished?
-
     brick.disableBody(true, true);
 
     this.score += 1;
-    this.scoreText.setText('Score:' + this.score);
+    this.scoreText.setText('Score: ' + this.score);
 
     if(this.score === this.brickCount)
     {
@@ -197,6 +189,14 @@ class MainScene extends Phaser.Scene {
    
   }
 
+  isGameOver() {
+    return this.ball.body.y > this.game.config.height;
+  }
+
+  isWon() {
+    return true;
+  }
+
   gameOver() {
     this.stateText.text = "GAME OVER \nClick to restart";
     this.stateText.visible = true;
@@ -205,6 +205,8 @@ class MainScene extends Phaser.Scene {
 
   restart(pointer, gameObject) {
       this.scene.restart();
+      this.score = 0;
+      this.scoreText.setText('Score: ');
   }
 
 
