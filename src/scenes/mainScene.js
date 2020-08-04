@@ -23,9 +23,11 @@ class MainScene extends Phaser.Scene {
     this.physics.world.setBoundsCollision(true, true, true, false);
     let platforms = this.physics.add.staticGroup();
 
+    console.log("create called");
+
     this.setupBricks();
-    this.setupBall();
     this.setupPaddle();
+    this.setupBall();
     this.setupUserInput();
     this.setupCollissions();
     this.setupText();
@@ -75,6 +77,7 @@ class MainScene extends Phaser.Scene {
   setupUserInput()
   {
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.input.on("gameobjectdown", this.restart); // detect any downs
   }
 
   setupCollissions()
@@ -179,11 +182,7 @@ class MainScene extends Phaser.Scene {
 
     if(this.score === this.brickCount)
     {
-      this.stateText.text = "GAME OVER \n Click to restart";
-      this.stateText.visible = true;
-
-      // the click to restart handler
-      //this.input.onTap.add(restart, this);
+      this.gameOver();
 
     } else {
       if (ball.body.velocity.x === 0) {
@@ -201,9 +200,10 @@ class MainScene extends Phaser.Scene {
   gameOver() {
     this.stateText.text = "GAME OVER \nClick to restart";
     this.stateText.visible = true;
+    this.stateText.setInteractive();
   }
 
-  restart() {
+  restart(pointer, gameObject) {
       this.scene.restart();
   }
 
