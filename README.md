@@ -3,14 +3,15 @@
 
 ![Screenshot](screenshot.png)
 
-### How To Run Locally
+#### How To Run Locally
 ```
 ruby -run -ehttpd . -p3000
 ```
 
-### Template Based Off
-https://github.com/yandeu/phaser-basic-template
+#### To Play
+[Click here](https://daneb.github.io/breakout/index.html) <- 🎉💖🐱‍🚀
 
-[To Play](https://daneb.github.io/breakout/index.html) <- 🎉💖🐱‍🚀
+##### Phaser Boiler Plate
+https://github.com/yandeu/phaser-basic-template
 
 
